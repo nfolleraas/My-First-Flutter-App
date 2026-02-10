@@ -51,9 +51,46 @@ class MyAppState extends ChangeNotifier { // ChangeNotifier is kinda like OnProp
 
 class MyHomePage extends StatelessWidget {
   @override
-  Widget build(BuildContext context) { // Gets called everytime the widget's circumstances change
-    var appState = context.watch<MyAppState>(); // uses watch<T>() to track the current app state
-    var pair = appState.current; // Separates the appstate to a new variable in order to scope only what it needs
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
+                ),
+              ],
+              selectedIndex: 0,
+              onDestinationSelected: (value) {
+                print('selected: $value');
+              },
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var pair = appState.current;
 
     IconData icon;
     if (appState.favorites.contains(pair)) {
@@ -61,35 +98,33 @@ class MyHomePage extends StatelessWidget {
     } else {
       icon = Icons.favorite_border;
     }
-    // build() must return a widget (or a nested tree of widgets - Scaffold)
-    return Scaffold(
-      body: Center(
-        child: Column( // A column... duhh ¯\_(ツ)_/¯. By default children are placed at the top of the window.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [ // list of children
-            Text('A randomly generated idea:'), 
-            BigCard(pair: pair), // takes the current random wordpair and displays it as a Text widget. Text no longer refers to the entire appState, and only what it needs
-            SizedBox(height: 10,),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon (
-                  onPressed: () {
-                    appState.toggleFavorite();
-                  },
-                  icon: Icon(icon),
-                  label: Text('Like'),
-                ),
-                ElevatedButton(
-                  onPressed: () { // no argument anonymous method??
-                    appState.getNext();
-                  },
-                  child: Text('Next'), // single child
-                ),
-              ],
-            ),
-          ], // Flutter heavily uses trailing commas. It makes it easier to implement new widgets and hints the auto formatter to make a new line (https://docs.flutter.dev/tools/formatting) 
-        ),
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFavorite();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('Next'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
