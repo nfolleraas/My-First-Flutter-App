@@ -29,6 +29,12 @@ class MyApp extends StatelessWidget { // The entire app is a stateless widget
 // Defines the app's state. In this case a simple variable.
 class MyAppState extends ChangeNotifier { // ChangeNotifier is kinda like OnPropertyChanged() from C#. It notifies widgets when the state changes.
   var current = WordPair.random(); // Generates a random word
+
+  // Reassigns current to a new random word and notfies listeners of the changes
+  void getNext() {
+    current = WordPair.random();
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -45,7 +51,7 @@ class MyHomePage extends StatelessWidget {
 
           ElevatedButton(
             onPressed: () { // no argument anonymous method??
-              print('button pressed');
+              appState.getNext();
             },
             child: Text('Next'), // single child
           ),
