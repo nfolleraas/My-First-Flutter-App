@@ -35,6 +35,18 @@ class MyAppState extends ChangeNotifier { // ChangeNotifier is kinda like OnProp
     current = WordPair.random();
     notifyListeners();
   }
+
+  var favorites = <WordPair>[]; // Specified list to only hold WordPair
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    }
+    else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
 }
 
 class MyHomePage extends StatelessWidget {
@@ -43,21 +55,41 @@ class MyHomePage extends StatelessWidget {
     var appState = context.watch<MyAppState>(); // uses watch<T>() to track the current app state
     var pair = appState.current; // Separates the appstate to a new variable in order to scope only what it needs
 
+    IconData icon;
+    if (appState.favorites.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
     // build() must return a widget (or a nested tree of widgets - Scaffold)
     return Scaffold(
-      body: Column( // A column... duhh ¯\_(ツ)_/¯. By default children are placed at the top of the window.
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [ // list of children
-          Text('A randomly generated idea:'), 
-          BigCard(pair: pair), // takes the current random wordpair and displays it as a Text widget. Text no longer refers to the entire appState, and only what it needs
-
-          ElevatedButton(
-            onPressed: () { // no argument anonymous method??
-              appState.getNext();
-            },
-            child: Text('Next'), // single child
-          ),
-        ], // Flutter heavily uses trailing commas. It makes it easier to implement new widgets and hints the auto formatter to make a new line (https://docs.flutter.dev/tools/formatting) 
+      body: Center(
+        child: Column( // A column... duhh ¯\_(ツ)_/¯. By default children are placed at the top of the window.
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [ // list of children
+            Text('A randomly generated idea:'), 
+            BigCard(pair: pair), // takes the current random wordpair and displays it as a Text widget. Text no longer refers to the entire appState, and only what it needs
+            SizedBox(height: 10,),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon (
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(icon),
+                  label: Text('Like'),
+                ),
+                ElevatedButton(
+                  onPressed: () { // no argument anonymous method??
+                    appState.getNext();
+                  },
+                  child: Text('Next'), // single child
+                ),
+              ],
+            ),
+          ], // Flutter heavily uses trailing commas. It makes it easier to implement new widgets and hints the auto formatter to make a new line (https://docs.flutter.dev/tools/formatting) 
+        ),
       ),
     );
   }
